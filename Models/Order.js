@@ -1,17 +1,17 @@
-const mongoose = require('mongoose')
+// const mongoose = require('mongoose')
 
-const schema = new mongoose.Schema({
+// const schema = new mongoose.Schema({
     
-        firstName: { type : String , trim: true, maxlength: 64, required: true},
+//         firstName: { type : String , trim: true, maxlength: 64, required: true},
 
-        lastName:  { type : String , trim: true, maxlength: 64, required: true},
+//         lastName:  { type : String , trim: true, maxlength: 64, required: true},
 
-        nickName:   { type : String , trim: true, maxlength: 64, required: false},
+//         nickName:   { type : String , trim: true, maxlength: 64, required: false},
 
-        email:   { type : String , trim: true, maxlength: 64, required: true}
+//         email:   { type : String , trim: true, maxlength: 64, required: true}
 
-  })
+//   })
   
-  const Model = mongoose.model('Order', schema)
+//   const Model = mongoose.model('Order', schema)
   
-  module.exports = Model
+//   module.exports = Model

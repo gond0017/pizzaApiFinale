@@ -42,43 +42,42 @@ router.post('/users', sanitizeBody, async (req, res) => {
     }
 })
 
+const update = () => async( req, res, next) => {
+
+  try{
+
+      const user = await User.findById(req.user._id)
+
+      user.password = req.sanitizedBody.password
+      
+      await user.save()
+  
+      res.send({data : user})
+  }
+ catch(err)
+ {
+    next(err)
+    res.status(401).send({
+    errors: [
+      {
+        status: 'Authentication error',
+        code: '401',
+        title: 'You have no permission to change password'
+      }]
+    }) 
+      
+ }
+}
+
+
+
+router.patch('/users/me',authorize, sanitizeBody , update())
 
 router.get('/users/me',authorize, async ( req, res)=>{
 
   const user = await User.findById(req.user._id).select('-password -__v')
 
-  if(!user)
-  {
-      var login= new LoginInfo({
-
-        username : user.firstName,
-
-        ipAddress : req.ip,
-
-        didSucceed : false,
-
-        createAt : new Date()
-      })
-
-      login.save()
-  }
-  else
-  {
-    var login = new LoginInfo({
-
-      username : user.firstName,
-
-      ipAddress : req.ip,
-
-      didSucceed : true,
-
-      createAt : new Date()
-
-    })
-
-    login.save()
-  }
-   // console.log(user.)
+  
   
     res.send({data: user})
     

@@ -1,6 +1,6 @@
-const sanitizeBody = require('../middleware/sanitizeBody')
+ const sanitizeBody = require('../middleware/sanitizeBody')
 
-const Student = require('../Models/Order')
+ const Pizza = require('../Models/Pizza')
 
 const express = require('express')
 
@@ -12,58 +12,60 @@ const router = express.Router()
 
 router.get('/', async (req, res) => {
 
-  const student = await Student.find();
+   const pizza = await Pizza.find();
 
-  res.send({
-    data: student
+   res.send({
+
+     data : pizza
   })
 
 })
 
-router.post('/', authenticate, sanitizeBody, async (req, res) => {
+router.post('/',authenticate, sanitizeBody, async (req, res) => {
 
-  let user = await User.findById(req.user._id)
+    let user = await User.findById(req.user._id)
 
-  if (user.isAdmin) {
+    if(user.isStaff)
+    {
+      let newPizza = new Pizza(req.sanitizedBody)
 
-    let newStudent = new Student(req.sanitizedBody)
+      await newPizza.save()
+  
+      res.status(201).send({
+        
+        data: newPizza
+  
+      })
+    }
+    else
+    {
+      res.status(401).send({
 
-    await newStudent.save()
+                    errors: [{
+              
+                      status: 'Unauthorize User',
+                      code: '401',
+                      title: 'You have no permission to Access database'
+              
+                    }]
+                  })
+    }
 
-    res.status(201).send({
-      
-      data: newStudent
-    })
+    
 
-
-  } else {
-
-    res.status(401).send({
-
-      errors: [{
-
-        status: 'Unauthorize User',
-        code: '401',
-        title: 'You have no permission to Access database'
-
-      }]
-    })
-
-  }
-
-})
+  })
 
 
 router.get('/:id', async (req, res) => {
 
   try {
 
-    const student = await Student.findById(req.user.id)
+    const pizza = await Pizza.findById(req.params.id)
 
-    if (!student) throw new Error('Resource not found')
+    if (!pizza) throw new Error('Resource not found')
 
     res.send({
-      data: student
+      data: pizza
     })
 
   } catch (err) {
@@ -78,13 +80,9 @@ router.get('/:id', async (req, res) => {
 
 const update = (overwrite = false) => async (req, res) => {
 
-  let user = await User.findById(req.params._id);
-
-  if(user.isAdmin)
-  {
     try {
 
-      const student = await Student.findByIdAndUpdate(
+      const pizza = await Pizza.findByIdAndUpdate(
   
         req.params.id,
   
@@ -98,11 +96,11 @@ const update = (overwrite = false) => async (req, res) => {
   
         }
       )
-      if (!student) throw new Error('Resource not found')
+      if (!pizza) throw new Error('Resource not found')
   
       res.send({
 
-        data: student
+        data: pizza
       })
   
     } catch (err) {
@@ -111,43 +109,25 @@ const update = (overwrite = false) => async (req, res) => {
 
       sendResourceNotFound(req, res)
     }
-  }
-  else
-  {
-    res.status(401).send({
-
-      errors: [{
-
-        status: 'Unauthorize User',
-        code: '401',
-        title: 'You have no permission to Access database'
-
-      }]
-    })
-  }
-  
 }
+  
 
-router.patch('/:id',authenticate, sanitizeBody, update((overwrite = false)))
+ router.patch('/:id',sanitizeBody, update((overwrite = false)))
 
-router.put('/:id',authenticate ,sanitizeBody, update((overwrite = true)))
+router.put('/:id',sanitizeBody, update((overwrite = true)))
 
 
-router.delete('/:id',authenticate, async (req, res) => {
+router.delete('/:id',async (req, res) => {
 
-  let user = await User.findById(req.params._id)
-
-  if(user.isAdmin)
-  {
-
+  
     try {
 
-      const student = await Student.findByIdAndRemove(req.user.id)
+      const pizza = await Pizza.findByIdAndRemove(req.params.id)
   
-      if (!student) throw new Error('Resource not found')
+      if (!pizza) throw new Error('Resource not found')
   
       res.send({
-        data: student
+        data: pizza
       })
   
     } catch (err) {
@@ -155,24 +135,7 @@ router.delete('/:id',authenticate, async (req, res) => {
       sendResourceNotFound(req, res)
   
     }
-  }
-  else
-  {
 
-    res.status(401).send({
-
-      errors: [{
-
-        status: 'Unauthorize User',
-        code: '401',
-        title: 'You have no permission to Access database'
-
-      }]
-    })
-
-  }
-
-  
 })
 
 

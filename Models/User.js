@@ -16,7 +16,7 @@ const schema = new mongoose.Schema({
 
     password : {type : String , trim : true , maxlength :70 , required : true},
 
-    isAdmin : { type : Boolean , trim : true , default : false , required : true}
+    isStaff : { type : Boolean , trim : true , default : false , required : true}
 
 })
 

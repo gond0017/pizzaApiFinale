@@ -1,189 +1,189 @@
-const Course = require('../Models/Ingredient')
+// const Course = require('../Models/Ingredient')
 
-const sanitizeBody = require('../middleware/sanitizeBody')
+// const sanitizeBody = require('../middleware/sanitizeBody')
 
-const express = require('express')
+// const express = require('express')
 
-let User = require('../Models/User')
+// let User = require('../Models/User')
 
-let authenticate = require('../middleware/auth')
+// let authenticate = require('../middleware/auth')
 
-const router = express.Router()
+// const router = express.Router()
 
-router.get('/', async(req, res, ) => {
+// router.get('/', async(req, res, ) => {
 
-    const course=await Course.find().populate('students');
+//     const course=await Course.find().populate('students');
 
-    res.send({Courses : course})
-})
-
-
-router.post('/', authenticate, sanitizeBody, async ( req, res) =>{
-
-    let user = await User.findById(req.user._id)
-
-    if(user.isAdmin)
-    {
-
-        let newcourse = new Course(req.sanitizedBody)
-
-        await newcourse.save()
-
-        res.status(201).send({ data: newcourse })
+//     res.send({Courses : course})
+// })
 
 
-    }
-    else
-    {   
+// router.post('/', authenticate, sanitizeBody, async ( req, res) =>{
 
-        res.status(401).send({
+//     let user = await User.findById(req.user._id)
 
-            errors: [{
+//     if(user.isAdmin)
+//     {
+
+//         let newcourse = new Course(req.sanitizedBody)
+
+//         await newcourse.save()
+
+//         res.status(201).send({ data: newcourse })
+
+
+//     }
+//     else
+//     {   
+
+//         res.status(401).send({
+
+//             errors: [{
       
-              status: 'Unauthorize User',
-              code: '401',
-              title: 'You have no permission to Access database'
+//               status: 'Unauthorize User',
+//               code: '401',
+//               title: 'You have no permission to Access database'
       
-            }]
-          })
+//             }]
+//           })
 
-    }
+//     }
 
-})
-
-
-router.get('/:id', async (req, res) =>{
-
-    try{
-
-        const course = await Course.findById(req.params.id).populate('students')
-
-        if(!course) throw new Error('Resourse not found')
-
-        res.send({Courses : course})
-    }
-    catch(err)
-    {
-
-        console.log(err)
-
-        sendResourceNotFound(req, res)
-    }
-})
-
-const update = (overwrite = false) => async (req, res) => {
+// })
 
 
-    let user = await User.findById(req.user._id)
+// router.get('/:id', async (req, res) =>{
 
-    if(user.isAdmin)
-    {
+//     try{
 
-        try {
+//         const course = await Course.findById(req.params.id).populate('students')
 
-            const course = await Course.findByIdAndUpdate(
+//         if(!course) throw new Error('Resourse not found')
+
+//         res.send({Courses : course})
+//     }
+//     catch(err)
+//     {
+
+//         console.log(err)
+
+//         sendResourceNotFound(req, res)
+//     }
+// })
+
+// const update = (overwrite = false) => async (req, res) => {
+
+
+//     let user = await User.findById(req.user._id)
+
+//     if(user.isAdmin)
+//     {
+
+//         try {
+
+//             const course = await Course.findByIdAndUpdate(
       
-              req.params.id,
+//               req.params.id,
       
-              req.sanitizedBody,
+//               req.sanitizedBody,
       
-              {
-                new: true,
-                overwrite,
-                runValidators: true
-              }
-            )
+//               {
+//                 new: true,
+//                 overwrite,
+//                 runValidators: true
+//               }
+//             )
       
-            if (!course) throw new Error('Resource not found')
+//             if (!course) throw new Error('Resource not found')
       
-            res.send({ data: course })
+//             res.send({ data: course })
       
-          } 
-          catch (err)
-           {
+//           } 
+//           catch (err)
+//            {
       
-            sendResourceNotFound(req, res)
+//             sendResourceNotFound(req, res)
       
-          }
+//           }
 
-    }
-    else
-    {
-        res.status(401).send({
+//     }
+//     else
+//     {
+//         res.status(401).send({
 
-            errors: [{
+//             errors: [{
       
-              status: 'Unauthorize User',
-              code: '401',
-              title: 'You have no permission to Access database'
+//               status: 'Unauthorize User',
+//               code: '401',
+//               title: 'You have no permission to Access database'
       
-            }]
-          })
-    }
+//             }]
+//           })
+//     }
 
-  }
+//   }
   
-router.put('/:id',authenticate, sanitizeBody, update((overwrite=true)))
+// router.put('/:id',authenticate, sanitizeBody, update((overwrite=true)))
   
-router.patch('/:id', authenticate, sanitizeBody, update((overwrite=false)))
+// router.patch('/:id', authenticate, sanitizeBody, update((overwrite=false)))
 
 
-router.delete('/:id', authenticate, async (req,res) => {
+// router.delete('/:id', authenticate, async (req,res) => {
 
-    let user = await User.isAdmin(req.user._id)
+//     let user = await User.isAdmin(req.user._id)
 
-    if(user.isAdmin)
-    {
-        try {
+//     if(user.isAdmin)
+//     {
+//         try {
 
-            const course = await Course.findByIdAndRemove(req.params.id)
+//             const course = await Course.findByIdAndRemove(req.params.id)
     
-            if(!course) throw Error('Resource not found')
+//             if(!course) throw Error('Resource not found')
     
-            res.send({Courses : course})
-        }
-        catch(err){
+//             res.send({Courses : course})
+//         }
+//         catch(err){
     
-            sendResourceNotFound(req,res)
-        }
+//             sendResourceNotFound(req,res)
+//         }
 
-    }
-    else
-    {
-        res.status(401).send({
+//     }
+//     else
+//     {
+//         res.status(401).send({
 
-            errors: [{
+//             errors: [{
       
-              status: 'Unauthorize User',
-              code: '401',
-              title: 'You have no permission to Access database'
+//               status: 'Unauthorize User',
+//               code: '401',
+//               title: 'You have no permission to Access database'
       
-            }]
-          })
-    }
+//             }]
+//           })
+//     }
 
     
-})
+// })
 
-function sendResourceNotFound(req,res)
-{
-    {
-        res.status(404).send({
+// function sendResourceNotFound(req,res)
+// {
+//     {
+//         res.status(404).send({
 
-            error : [
-                {
+//             error : [
+//                 {
 
-                    status : 'Not found',
+//                     status : 'Not found',
 
-                    code : '404',
+//                     code : '404',
 
-                    title : 'Return does not exist',
+//                     title : 'Return does not exist',
 
-                    description : `We could not find a course with id : ${req.params.id}`
-                }
-            ]
-        })
-    }
-}
+//                     description : `We could not find a course with id : ${req.params.id}`
+//                 }
+//             ]
+//         })
+//     }
+// }
 
-module.exports = router;
+// module.exports = router;
