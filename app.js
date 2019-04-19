@@ -9,9 +9,11 @@ const app = express()
 
 app.use(express.json())
 
-app.use('/api/Students',require('./Routes/student'))
+app.use('/api/Pizzas',require('./Routes/Pizzas'))
 
-app.use('/api/Courses',require('./Routes/course'))
+app.use('/api/Ingredients',require('./Routes/Ingredients'))
+
+app.use('/api/Orders',require('./Routes/Orders'))
 
 app.use('/auth', require('./Routes/Authentication'))
 
