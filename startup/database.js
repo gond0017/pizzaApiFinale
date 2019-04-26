@@ -1,21 +1,32 @@
-const debug = require('debug')('a3')
 
 const mongoose = require('mongoose')
 
-module.exports = () => {
+const logger = require('../startup/logger')
 
-    mongoose.connect(`mongodb://localhost:27017/finale`,
+const config = require('config')
+
+module.exports = () => {
+    const db = config.get('db')
+  
+    let credentials = ''
+    if (process.env.NODE_ENV === 'production') {
+      credentials = `${db.user}:${db.password}@`
+    }
+  
+    const connectionString = `mongodb://${credentials}${db.host}:${db.port}/${db.name}?authSource=admin`
+
+    mongoose.connect(connectionString ,
     {
         useNewUrlParser : true
     })
     .then (()=> {
 
-        debug(`Connected to MongoDb...`)
+        logger.log("info",`Connected to MongoDb...`)
 
     })
     .catch(err => {
 
-        debug(`Error connecting to MongoDB ...`, err)
+        logger.log("error",`Error connecting to MongoDB ...`, err)
 
         process.exit(1)
     })

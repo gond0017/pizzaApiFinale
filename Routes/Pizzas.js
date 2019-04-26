@@ -1,6 +1,6 @@
- const sanitizeBody = require('../middleware/sanitizeBody')
+const sanitizeBody = require('../middleware/sanitizeBody')
 
- const Pizza = require('../Models/Pizza')
+const Pizza = require('../Models/Pizza')
 
 const express = require('express')
 
@@ -10,57 +10,58 @@ const authenticate = require('../middleware/auth')
 
 const router = express.Router()
 
-router.get('/', async (req, res) => {
 
-   const pizza = await Pizza.find();
+router.get('/',  async (req, res) => {
 
-   res.send({
+  const pizza = await Pizza.find().populate('ingredients');
 
-     data : pizza
-  })
+  res.send({
+
+    data : pizza
+
+ })
 
 })
 
 router.post('/',authenticate, sanitizeBody, async (req, res) => {
 
-    let user = await User.findById(req.user._id)
+   let user = await User.findById(req.user._id)
 
-    if(user.isStaff)
-    {
-      let newPizza = new Pizza(req.sanitizedBody)
+   if(user.isStaff)
+   {
+     let newPizza = new Pizza(req.sanitizedBody)
 
-      await newPizza.save()
-  
-      res.status(201).send({
-        
-        data: newPizza
-  
+     await newPizza.save()
+ 
+     res.status(201).send({
+       
+       data: newPizza
+ 
+     })
+   }
+   else
+   {
+     res.status(401).send({
+
+        errors: [{
+
+          status: 'Unauthorize User',
+          code: '401',
+          title: 'You have no permission to Access database'
+
+        }]
       })
-    }
-    else
-    {
-      res.status(401).send({
+   }
 
-                    errors: [{
-              
-                      status: 'Unauthorize User',
-                      code: '401',
-                      title: 'You have no permission to Access database'
-              
-                    }]
-                  })
-    }
-
-    
-
-  })
-
+  
+ })
 
 router.get('/:id', async (req, res) => {
 
+
   try {
 
-    const pizza = await Pizza.findById(req.params.id)
+    const pizza = await Pizza.findById(req.params.id).populate("ingredients")
 
     if (!pizza) throw new Error('Resource not found')
 
@@ -69,7 +70,7 @@ router.get('/:id', async (req, res) => {
     })
 
   } catch (err) {
-
+ 
     console.error(err)
 
     sendResourceNotFound(req, res)
@@ -80,82 +81,83 @@ router.get('/:id', async (req, res) => {
 
 const update = (overwrite = false) => async (req, res) => {
 
-    try {
+   try {
 
-      const pizza = await Pizza.findByIdAndUpdate(
-  
-        req.params.id,
-  
-        req.sanitizedBody,
-  
-        {
-  
-          new: true,
-          overwrite,
-          runValidators: true
-  
-        }
-      )
-      if (!pizza) throw new Error('Resource not found')
-  
-      res.send({
+     const pizza = await Pizza.findByIdAndUpdate(
+ 
+       req.params.id,
+ 
+       req.sanitizedBody,
+ 
+       {
+ 
+         new: true,
+         overwrite,
+         runValidators: true
+ 
+       }
+     )
+     if (!pizza) throw new Error('Resource not found')
+ 
+     res.send({
 
-        data: pizza
-      })
-  
-    } catch (err) {
+       data: pizza
+     })
+ 
+   } catch (err) {
 
-      console.log(err.message);
+     console.log(err.message);
 
-      sendResourceNotFound(req, res)
-    }
+     sendResourceNotFound(req, res)
+   }
 }
-  
+ 
 
- router.patch('/:id',sanitizeBody, update((overwrite = false)))
+router.patch('/:id', sanitizeBody, update((overwrite = false)))
 
-router.put('/:id',sanitizeBody, update((overwrite = true)))
+router.put('/:id', sanitizeBody, update((overwrite = true)))
 
 
-router.delete('/:id',async (req, res) => {
+router.delete('/:id', async (req, res) => {
 
-  
-    try {
+ 
+   try {
 
-      const pizza = await Pizza.findByIdAndRemove(req.params.id)
-  
-      if (!pizza) throw new Error('Resource not found')
-  
-      res.send({
-        data: pizza
-      })
-  
-    } catch (err) {
-  
-      sendResourceNotFound(req, res)
-  
-    }
+     const pizza = await Pizza.findByIdAndRemove(req.params.id)
+ 
+     if (!pizza) throw new Error('Resource not found')
+ 
+     res.send({
+       data: pizza
+     })
+ 
+   } catch (err) {
+ 
+     sendResourceNotFound(req, res)
+ 
+   }
 
 })
 
 
 function sendResourceNotFound(req, res) {
-  {
-    console.log(res.message)
-    res.status(404).send({
+ {
+   console.log(res.message)
+   res.status(404).send({
 
-      errors: [{
+     errors: [{
 
-        status: 'Not found',
+       status: 'Not found',
 
-        code: '404',
+       code: '404',
 
-        title: 'Return does not exist',
+       title: 'Return does not exist',
 
-        description: `We could not find a Student with id : ${req.params.id}`
-      }]
-    })
-  }
+       description: `We could not find a Student with id : ${req.params.id}`
+     }]
+   })
+ }
 
 }
+
 module.exports = router

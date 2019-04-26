@@ -1,21 +1,23 @@
-// const Student = require('./Order')
+const Order = require('./Order')
 
-// const mongoose= require('mongoose');
+const mongoose= require('mongoose');
 
-// const schema = new mongoose.Schema({
+const schema = new mongoose.Schema({
 
-//     code : {type: String, maxlength: 16, required: true},
+    name : {type: String, maxlength: 64, required: true},
 
-//     title : {type: String, maxlength: 255, required: true},
+    price : {type: Number, maxlength: 10000, default: 100},
 
-//     description : {type: String, maxlength: 2048, required: false},
+    quantity : {type: Number, maxlength: 1000, default: 10},
 
-//     url : {type: String, maxlength: 512, required: false},
+    isGlutenFree : {type: Boolean, default: false},
 
-//     students : {type : mongoose.Schema.Types.ObjectId,ref:'Student',required:false}
+    imageUrl : {type: String, maxlength: 1024},
 
-// })
+    categories : {type: String , ENUM : ['meat','spicy','vegitarian','vegan', 'halal','kosher','cheeze','seasonings']}
 
-// const Model= mongoose.model('Ingredient',schema);
+})
 
-// module.exports=Model;
+const Model= mongoose.model('Ingredient',schema);
+
+module.exports=Model;

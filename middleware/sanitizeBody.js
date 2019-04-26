@@ -1,5 +1,6 @@
-const debug = require('debug')('sanitize:body')
+//const debug = require('debug')('sanitize:body')
 
+const logger = require('../startup/logger')
 const xss = require('xss')
 
 const sanitize = sourceString => {
@@ -22,7 +23,7 @@ const stripTags = payload => {
 
     if (attributes[key] instanceof Array) {
 
-      debug('Recurse array', attributes[key])
+      logger.log('info', attributes[key])
 
       attributes[key] = attributes[key].map(element => {
 
@@ -36,7 +37,7 @@ const stripTags = payload => {
     else if (attributes[key] instanceof Object)
      {
 
-      debug('Recurse object', attributes[key])
+      logger.log('info', attributes[key])
 
       attributes[key] = stripTags(attributes[key])
 
@@ -50,15 +51,15 @@ const stripTags = payload => {
 
 module.exports = (req, res, next) => {
 
-  debug({ body: req.body })
+  logger.log("info", { body: req.body })
 
   const { id, _id, ...attributes } = req.body
 
-  debug({ attributes })
+  logger.log( "info" ,{ attributes })
 
   const sanitizedBody = stripTags(attributes)
 
-  debug({ sanitizedBody })
+  logger.log("info", { sanitizedBody })
 
   req.sanitizedBody = sanitizedBody
   

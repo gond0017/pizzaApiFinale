@@ -1,3 +1,4 @@
+const logger = require('../../startup/logger')
 
 const express = require('express')
 
@@ -18,9 +19,7 @@ router.post('/users', sanitizeBody, async (req, res) => {
     try {
   
       let newUser = new User(req.sanitizedBody)
-
-      //newUser.password = await bcrypt.hash(newUser.password, saltRounds)
-  
+      
       await newUser.save()
   
       res.status(201).send({data: newUser})
@@ -69,21 +68,17 @@ const update = () => async( req, res, next) => {
  }
 }
 
+router.patch('/users/me', authorize, sanitizeBody , update())
 
-
-router.patch('/users/me',authorize, sanitizeBody , update())
-
-router.get('/users/me',authorize, async ( req, res)=>{
+router.get('/users/me'  ,authorize, async ( req, res)=>{
 
   const user = await User.findById(req.user._id).select('-password -__v')
-
-  
   
     res.send({data: user})
     
 })
 
-router.post('/tokens', sanitizeBody, async (req, res) => {
+router.post('/tokens',sanitizeBody, async (req, res) => {
 
     const {email, password} = req.sanitizedBody
   
@@ -103,7 +98,6 @@ router.post('/tokens', sanitizeBody, async (req, res) => {
       return res.status(401).send({
   
         errors: [
-  
           {
             status: 'Unauthorized',
             code: '401',
